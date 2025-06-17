@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS Forensic Lab - Fingerprint Enhancement Division</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .scanner-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            background: 
+                linear-gradient(90deg, transparent 0%, rgba(0, 255, 136, 0.03) 50%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, rgba(0, 255, 136, 0.03) 50%, transparent 100%);
+            background-size: 100px 100px;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100px) translateY(-100px); }
+            100% { transform: translateX(100px) translateY(100px); }
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #00ff88;
+            padding: 1rem 0;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+            letter-spacing: 3px;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.7);
+            letter-spacing: 2px;
+        }
+
+        .lab-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .panel {
+            background: rgba(0, 20, 40, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 255, 136, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            animation: sweep 3s infinite;
+        }
+
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .panel-header {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            color: #00ff88;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed #00ff88;
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(0, 255, 136, 0.05);
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .upload-zone:hover {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .upload-zone.dragover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(0, 255, 136, 0.2);
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00ff88;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00ff88;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            color: #000;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .processing {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .processing.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 255, 136, 0.3);
+            border-top: 3px solid #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-panel {
+            grid-column: 1 / -1;
+            display: none;
+        }
+
+        .results-panel.active {
+            display: block;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .result-item {
+            text-align: center;
+        }
+
+        .result-label {
+            font-family: 'Orbitron', monospace;
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .analysis-data {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            color: #888;
+        }
+
+        .data-value {
+            color: #00ff88;
+            font-weight: 500;
+        }
+
+        .warning {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+            color: #ff6b6b;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .results-container {
+            padding: 1rem;
+        }
+
+        .image-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .image-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .image-box h3 {
+            font-family: 'Orbitron', monospace;
+            color: #00ff88;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .image-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .image-placeholder:empty::after {
+            content: 'No image';
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .upload-zone.dragover {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .processing-message {
+            color: #00ff88;
+            text-align: center;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .processing-message.active {
+            display: block;
+        }
+
+        .error-details {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            color: #ff6b6b;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .lab-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanner-lines"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">NEXUS Forensic Lab</div>
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>System Online</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>AI Model Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <h1 class="section-title">Fingerprint Enhancement Division</h1>
+        
+        <div class="lab-grid">
+            <div class="panel">
+                <div class="panel-header">Upload Fingerprint</div>
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drag & Drop your .tif fingerprint image here</div>
+                    <div class="upload-subtext">or click to browse</div>
+                    <input type="file" id="fileInput" accept=".tif,.tiff" style="display: none;">
+                </div>
+                <div class="error-message" id="errorMessage"></div>
+                <div class="error-details" id="errorDetails"></div>
+                <div class="processing-message" id="processingMessage">Processing image... Please wait.</div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">Processing Results</div>
+                <div class="results-container">
+                    <div class="image-comparison">
+                        <div class="image-box">
+                            <h3>Original</h3>
+                            <div class="image-placeholder" id="originalImage"></div>
+                        </div>
+                        <div class="image-box">
+                            <h3>Enhanced</h3>
+                            <div class="image-placeholder" id="enhancedImage"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const originalImage = document.getElementById('originalImage');
+        const enhancedImage = document.getElementById('enhancedImage');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorDetails = document.getElementById('errorDetails');
+        const processingMessage = document.getElementById('processingMessage');
+
+        function showError(message, details = '') {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            if (details) {
+                errorDetails.textContent = details;
+                errorDetails.style.display = 'block';
+            } else {
+                errorDetails.style.display = 'none';
+            }
+            processingMessage.classList.remove('active');
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+            errorDetails.style.display = 'none';
+        }
+
+        function showProcessing() {
+            processingMessage.classList.add('active');
+            hideError();
+        }
+
+        function hideProcessing() {
+            processingMessage.classList.remove('active');
+        }
+
+        function displayImage(file, element) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    element.innerHTML = `<img src="${e.target.result}" alt="Fingerprint">`;
+                    resolve();
+                };
+                reader.onerror = (e) => reject(e);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Handle drag and drop events
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        // Handle click to upload
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+
+        async function handleFile(file) {
+            if (!file.type.match('image/tiff') && !file.type.match('image/tif')) {
+                showError('Please upload a .tif file');
+                return;
+            }
+
+            hideError();
+            showProcessing();
+            enhancedImage.innerHTML = ''; // Clear previous result
+            originalImage.innerHTML = ''; // Clear previous result
+
+            try {
+                // Upload and process the image
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const response = await fetch('http://localhost:1234/api/denoise', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Server error', { cause: data.details });
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    // Show original as returned PNG
+                    originalImage.innerHTML = `<img src="data:image/png;base64,${data.originalImage}" alt="Original fingerprint">`;
+                    enhancedImage.innerHTML = `<img src="data:image/png;base64,${data.processedImage}" alt="Enhanced fingerprint">`;
+                } else {
+                    throw new Error(data.error || 'Processing failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(
+                    error.message || 'Failed to process image. Please try again.',
+                    error.cause || ''
+                );
+            } finally {
+                hideProcessing();
+            }
+        }
+    </script>
+</body>
+</html>
