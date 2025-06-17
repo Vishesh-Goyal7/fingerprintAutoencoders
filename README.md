@@ -71,3 +71,10 @@ Together, they optimize the balance between **realism and fidelity**.
 - L1 Loss (MAE): Measures pixel-level reconstruction accuracy
 - RMSE: (optional) For numeric comparison with original
 - Qualitative inspection of denoising artifacts and sharpness
+
+---
+
+---
+## MIT License
+
+Feel free to use this model as per your convenience and requirements. 
