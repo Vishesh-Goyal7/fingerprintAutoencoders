@@ -1,4 +1,4 @@
-# 🔍 Fingerprint Denoising using Conditional GAN (U-Net + PatchGAN)
+# 🔍 Reconstructing Partial Fingerprints (U-Net + PatchGAN)
 
 This project implements a **conditional Generative Adversarial Network (cGAN)** for fingerprint image denoising using a **U-Net generator** and a **PatchGAN discriminator**, inspired by the Pix2Pix architecture. The model learns to restore clean fingerprint images from their noisy versions using adversarial training.
 
@@ -60,10 +60,9 @@ Together, they optimize the balance between **realism and fidelity**.
 
 ## 🖼️ Sample Results
 
-| Noisy Input | Denoised Output |
-|-------------|------------------|
-| ![](results/noisy_1.png) | ![](results/denoised_1.png) |
-| ![](results/noisy_2.png) | ![](results/denoised_2.png) |
+
+![alt text](image.png)
+![alt text](image-1.png)
 
 ---
 
