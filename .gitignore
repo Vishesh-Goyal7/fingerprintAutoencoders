@@ -1,0 +1,4 @@
+/backend/.venv
+/data
+*.h5
+/backend/node_modules
